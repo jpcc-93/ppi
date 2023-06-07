@@ -233,6 +233,8 @@ class Productos(QMainWindow):
         self.departamento.addItem("Niños")
         self.departamento.addItem("Otros")
         self.departamento.setFixedWidth(100)
+        #inventario no se muestra pero la idea es guardarlo en 0
+
 
         # espacio en el formulario
         self.espacio = QWidget()
@@ -297,6 +299,12 @@ class Productos(QMainWindow):
         self.letreroexp.setText(
             "Ingrese el codigo del producto a eliminar \nEn caso de no recordarlo consultar en inventario")
         self.multibotonguardar.setText("Buscar")
+
+        self.multibotonguardar.clicked.connect(self.accionmultiBotonbuscareliminar)
+
+
+
+
     def accionmultiBotonguardar(self):
         # variable para controral si el ingreso de los datos estan correctos
         self.datosCorrectos = True
@@ -380,6 +388,7 @@ class Productos(QMainWindow):
 
             self.file = open('datos/productos.txt', 'ab')
 
+
             # traer el texto de los QLineEdit y los agrega concatenandolos
             # para escribirlos en formato binario utf-8
             self.file.write(bytes(
@@ -388,7 +397,7 @@ class Productos(QMainWindow):
                 + self.valorcostoP.text() + ";"
                 + self.valorventaP.text() + ";"
                 + self.departamento.currentText() + ";"
-                + self.inventario.text() + "\n"
+                + "0" + "\n"
                 , encoding='UTF-8'))
             # cerramos el archivo
             self.file.close()
@@ -452,12 +461,140 @@ class Productos(QMainWindow):
 
         if(not self.datosCorrectos):
             QMessageBox.warning(self, "Warning", "El codigo no existe")
+
         else:
             self.nombreP.setText(u.nombre)
             self.valorcostoP.setText(u.valorcompra)
             self.valorventaP.setText(u.valorventa)
             self.departamento.setCurrentText(u.departamento)
 
+    def accionmultiBotonbuscareliminar(self):
+        # variable para controral si el ingreso de los datos estan correctos
+        self.datosCorrectos = False
+
+        if (
+                self.codigoP.text() == ""
+        ):
+            QMessageBox.warning(self, "Warning", "Debe de ingresar el codigo del producto")
+            self.datosCorrectos = False
+        else:
+            if (
+                    not self.codigoP.text().isnumeric()
+
+            ):
+                QMessageBox.warning(self, "Warning", "El campo codigo debe ser numerico")
+                self.datosCorrectos = False
+
+        # Abrimos el archivo en modo lectura:
+        self.file = open('datos/productos.txt', 'rb')
+
+        # Lista vacía para agregar todos los usuarios:
+        productos1 = []
+
+        while self.file:
+            linea = self.file.readline().decode('UTF-8')
+
+            # Obtenemos del string una lista con 11 datos separados por;
+            lista = linea.split(";")
+            # Se para si ya no hay más registros en el archivo
+            if linea == '':
+                break
+            # Creamos un objeto de tipo cliente llamado u:
+            print(linea)
+            u = Claseproductos(
+                lista[0],
+                lista[1],
+                lista[2],
+                lista[3],
+                lista[4],
+                lista[5],
+            )
+
+            # Metemos el objeto en la lista de usuarios:
+            productos1.append(u)
+
+        # Cerramos el archivo:
+        self.file.close()
+
+        for u in productos1:
+            # comparamos el codigo ingresado
+            if u.codigo == self.codigoP.text():
+                self.datosCorrectos = True
+                break
+
+        if (not self.datosCorrectos):
+            QMessageBox.warning(self, "Warning", "El codigo no existe")
+
+        else:
+            self.nombreP.setText(u.nombre)
+            self.valorcostoP.setText(u.valorcompra)
+            self.valorventaP.setText(u.valorventa)
+            self.departamento.setCurrentText(u.departamento)
+            boton = QMessageBox.question(
+                self,
+                'Confirmation',
+                '¿Estas seguro de borrar este registro?',
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if boton == QMessageBox.StandardButton.Yes:
+
+                if (self.codigoP != ""):
+                    # Abrimos el archivo en modo lectura:
+                    self.file = open('datos/productos.txt', 'rb')
+
+                    # Lista vacía para agregar todos los usuarios:
+                    productos1 = []
+
+                    while self.file:
+                        linea = self.file.readline().decode('UTF-8')
+
+                        # Obtenemos del string una lista con 11 datos separados por;
+                        lista = linea.split(";")
+                        # Se para si ya no hay más registros en el archivo
+                        if linea == '':
+                            break
+                        # Creamos un objeto de tipo cliente llamado u:
+                        print(linea)
+                        u = Claseproductos(
+                            lista[0],
+                            lista[1],
+                            lista[2],
+                            lista[3],
+                            lista[4],
+                            lista[5],
+                        )
+
+                        # Metemos el objeto en la lista de usuarios:
+                        productos1.append(u)
+
+                    # Cerramos el archivo:
+                    self.file.close()
+
+                    for u in productos1:
+                        # comparamos el codigo ingresado
+                        if u.codigo == self.codigoP.text():
+                            productos1.remove(u)
+                            break
+                    # se abre el archivo en modo escritura
+                    self.file = open('datos/clientes.txt', 'wb')
+
+                    for u in productos1:
+                        self.file.write(bytes(u.codigo + ';' +
+                                              u.nombre + ';' +
+                                              u.valorcompra + ';' +
+                                              u.valorventa + ';' +
+                                              u.departamento + ';' +
+                                              u.cantidad, encoding='UTF-8'))
+                    # cerramos el archivo
+                    self.file.close()
+                    QMessageBox.question(
+                        self,
+                        'confirmacion',
+                        'El registro ha sido eliminado exitosamente.',
+                        QMessageBox.StandardButton.Yes
+                    )
+
+            self.limpiarcampos()
 
     def sinPermisos(self):
         QMessageBox.warning(self, "Warning", "No cuenta con permisos")
