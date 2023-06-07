@@ -467,6 +467,10 @@ class Productos(QMainWindow):
             self.valorcostoP.setText(u.valorcompra)
             self.valorventaP.setText(u.valorventa)
             self.departamento.setCurrentText(u.departamento)
+            self.nombreP.setReadOnly(False)
+            self.valorcostoP.setReadOnly(False)
+            self.valorventaP.setReadOnly(False)
+            self.departamento.setDisabled(False)
 
     def accionmultiBotonbuscareliminar(self):
         # variable para controral si el ingreso de los datos estan correctos
@@ -538,61 +542,62 @@ class Productos(QMainWindow):
             )
             if boton == QMessageBox.StandardButton.Yes:
 
-                if (self.codigoP != ""):
-                    # Abrimos el archivo en modo lectura:
-                    self.file = open('datos/productos.txt', 'rb')
 
-                    # Lista vacía para agregar todos los usuarios:
-                    productos1 = []
+                # Abrimos el archivo en modo lectura:
+                self.file = open('datos/productos.txt', 'rb')
 
-                    while self.file:
-                        linea = self.file.readline().decode('UTF-8')
+                # Lista vacía para agregar todos los usuarios:
+                productos1 = []
 
-                        # Obtenemos del string una lista con 11 datos separados por;
-                        lista = linea.split(";")
-                        # Se para si ya no hay más registros en el archivo
-                        if linea == '':
-                            break
-                        # Creamos un objeto de tipo cliente llamado u:
-                        print(linea)
-                        u = Claseproductos(
-                            lista[0],
-                            lista[1],
-                            lista[2],
-                            lista[3],
-                            lista[4],
-                            lista[5],
-                        )
+                while self.file:
+                    linea = self.file.readline().decode('UTF-8')
 
-                        # Metemos el objeto en la lista de usuarios:
-                        productos1.append(u)
-
-                    # Cerramos el archivo:
-                    self.file.close()
-
-                    for u in productos1:
-                        # comparamos el codigo ingresado
-                        if u.codigo == self.codigoP.text():
-                            productos1.remove(u)
-                            break
-                    # se abre el archivo en modo escritura
-                    self.file = open('datos/clientes.txt', 'wb')
-
-                    for u in productos1:
-                        self.file.write(bytes(u.codigo + ';' +
-                                              u.nombre + ';' +
-                                              u.valorcompra + ';' +
-                                              u.valorventa + ';' +
-                                              u.departamento + ';' +
-                                              u.cantidad, encoding='UTF-8'))
-                    # cerramos el archivo
-                    self.file.close()
-                    QMessageBox.question(
-                        self,
-                        'confirmacion',
-                        'El registro ha sido eliminado exitosamente.',
-                        QMessageBox.StandardButton.Yes
+                    # Obtenemos del string una lista con 11 datos separados por;
+                    lista = linea.split(";")
+                    # Se para si ya no hay más registros en el archivo
+                    if linea == '':
+                        break
+                    # Creamos un objeto de tipo cliente llamado u:
+                    print(linea)
+                    u = Claseproductos(
+                        lista[0],
+                        lista[1],
+                        lista[2],
+                        lista[3],
+                        lista[4],
+                        lista[5],
                     )
+
+                    # Metemos el objeto en la lista de usuarios:
+                    productos1.append(u)
+
+                # Cerramos el archivo:
+                self.file.close()
+
+                for u in productos1:
+                    # comparamos el codigo ingresado
+                    if u.codigo == self.codigoP.text():
+                        print(u)
+                        productos1.remove(u)
+                        break
+                # se abre el archivo en modo escritura
+                self.file = open('datos/productos.txt', 'wb')
+
+                for u in productos1:
+                    self.file.write(bytes(u.codigo + ';' +
+                                          u.nombre + ';' +
+                                          u.valorcompra + ';' +
+                                          u.valorventa + ';' +
+                                          u.departamento + ';' +
+                                          u.cantidad, encoding='UTF-8'))
+                # cerramos el archivo
+                self.file.close()
+                QMessageBox.question(
+                    self,
+                    'confirmacion',
+                    'El registro ha sido eliminado exitosamente.',
+                    QMessageBox.StandardButton.Yes
+                )
 
             self.limpiarcampos()
 
