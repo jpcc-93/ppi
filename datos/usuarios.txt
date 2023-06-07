@@ -1,0 +1,2 @@
+Administrador;admin;1234;0;1
+Basico;basi;1234;1;0
