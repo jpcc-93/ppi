@@ -266,7 +266,37 @@ class Productos(QMainWindow):
         self.botoneliminarP.setDisabled(False)
         self.multibotonguardar.clicked.connect(self.accionmultiBotonguardar)
 
+    def casoModificar(self):
+        self.limpiarlayout()
+        self.crear_botones()
+        self.crearformularios()
+        self.botonmodificarP.setDisabled(True)
+        self.botonnuevoP.setDisabled(False)
+        self.botoneliminarP.setDisabled(False)
+        self.nombreP.setReadOnly(True)
+        self.valorcostoP.setReadOnly(True)
+        self.valorventaP.setReadOnly(True)
+        self.departamento.setDisabled(True)
+        self.letrero1.setText("Modificar Producto")
+        self.letreroexp.setText("Ingrese el codigo del producto a modificar \nEn caso de no recordarlo consultar en inventario")
+        self.multibotonguardar.setText("Buscar")
+        self.multibotonguardar.clicked.connect(self.accionmultiBotonbuscar)
 
+    def casoEliminar(self):
+        self.limpiarlayout()
+        self.crear_botones()
+        self.crearformularios()
+        self.botonmodificarP.setDisabled(False)
+        self.botonnuevoP.setDisabled(False)
+        self.botoneliminarP.setDisabled(True)
+        self.nombreP.setReadOnly(True)
+        self.valorcostoP.setReadOnly(True)
+        self.valorventaP.setReadOnly(True)
+        self.departamento.setDisabled(True)
+        self.letrero1.setText("Eliminar Producto")
+        self.letreroexp.setText(
+            "Ingrese el codigo del producto a eliminar \nEn caso de no recordarlo consultar en inventario")
+        self.multibotonguardar.setText("Buscar")
     def accionmultiBotonguardar(self):
         # variable para controral si el ingreso de los datos estan correctos
         self.datosCorrectos = True
@@ -366,36 +396,68 @@ class Productos(QMainWindow):
             self.limpiarcampos()
             QMessageBox.information(self,"Confirmado","Se creo el producto correctamente")
 
-    def casoModificar(self):
-        self.limpiarlayout()
-        self.crear_botones()
-        self.crearformularios()
-        self.botonmodificarP.setDisabled(True)
-        self.botonnuevoP.setDisabled(False)
-        self.botoneliminarP.setDisabled(False)
-        self.nombreP.setReadOnly(True)
-        self.valorcostoP.setReadOnly(True)
-        self.valorventaP.setReadOnly(True)
-        self.departamento.setDisabled(True)
-        self.letrero1.setText("Modificar Producto")
-        self.letreroexp.setText("Ingrese el codigo del producto a modificar \nEn caso de no recordarlo consultar en inventario")
-        self.multibotonguardar.setText("Buscar")
+    def accionmultiBotonbuscar(self):
+        # variable para controral si el ingreso de los datos estan correctos
+        self.datosCorrectos = False
 
-    def casoEliminar(self):
-        self.limpiarlayout()
-        self.crear_botones()
-        self.crearformularios()
-        self.botonmodificarP.setDisabled(False)
-        self.botonnuevoP.setDisabled(False)
-        self.botoneliminarP.setDisabled(True)
-        self.nombreP.setReadOnly(True)
-        self.valorcostoP.setReadOnly(True)
-        self.valorventaP.setReadOnly(True)
-        self.departamento.setDisabled(True)
-        self.letrero1.setText("Eliminar Producto")
-        self.letreroexp.setText(
-            "Ingrese el codigo del producto a eliminar \nEn caso de no recordarlo consultar en inventario")
-        self.multibotonguardar.setText("Buscar")
+        if (
+                self.codigoP.text() == ""
+        ):
+            QMessageBox.warning(self,"Warning","Debe de ingresar el codigo del producto")
+            self.datosCorrectos = False
+        else:
+            if(
+                not self.codigoP.text().isnumeric()
+
+            ):
+                QMessageBox.warning(self, "Warning", "El campo codigo debe ser numerico")
+                self.datosCorrectos = False
+
+        # Abrimos el archivo en modo lectura:
+        self.file = open('datos/productos.txt', 'rb')
+
+        # Lista vacía para agregar todos los usuarios:
+        productos1 = []
+
+        while self.file:
+            linea = self.file.readline().decode('UTF-8')
+
+            # Obtenemos del string una lista con 11 datos separados por;
+            lista = linea.split(";")
+            # Se para si ya no hay más registros en el archivo
+            if linea == '':
+                break
+            # Creamos un objeto de tipo cliente llamado u:
+            print(linea)
+            u = Claseproductos(
+                lista[0],
+                lista[1],
+                lista[2],
+                lista[3],
+                lista[4],
+                lista[5],
+            )
+
+            # Metemos el objeto en la lista de usuarios:
+            productos1.append(u)
+
+        # Cerramos el archivo:
+        self.file.close()
+
+        for u in productos1:
+            # comparamos el codigo ingresado
+            if u.codigo == self.codigoP.text():
+                self.datosCorrectos = True
+                break
+
+        if(not self.datosCorrectos):
+            QMessageBox.warning(self, "Warning", "El codigo no existe")
+        else:
+            self.nombreP.setText(u.nombre)
+            self.valorcostoP.setText(u.valorcompra)
+            self.valorventaP.setText(u.valorventa)
+            self.departamento.setCurrentText(u.departamento)
+
 
     def sinPermisos(self):
         QMessageBox.warning(self, "Warning", "No cuenta con permisos")
