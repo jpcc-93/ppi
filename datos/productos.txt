@@ -1,1 +1,8 @@
 0000;pijama prueba;30000;40000;otros;2
+25;Pijama cars;15000;20000;Dama;Inventario
+5;Pijama monsters;20000;30000;Hombres;Inventario
+8;Pijama admas;20000;30000;Hombres;Inventario
+3;Pijama azul;20000;30000;Niños;Inventario
+58;prueba 3;20000;20000;Dama;Inventario
+56;pijama 3;2000;2000;Dama;Inventario
+45;pijama prueba;2555;2000;Dama;Inventario
