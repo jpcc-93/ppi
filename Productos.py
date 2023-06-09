@@ -1,7 +1,9 @@
+import sys
+
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QIcon, QPixmap, QFont
 from PyQt5.QtWidgets import QMainWindow, QAction, QToolBar, QLabel, QFormLayout, QWidget, QLineEdit, QComboBox, \
-    QPushButton, QHBoxLayout, QMessageBox
+    QPushButton, QHBoxLayout, QMessageBox, QApplication
 
 from Fondo import Fondo
 from Inventario import Inventario
@@ -266,7 +268,7 @@ class Productos(QMainWindow):
         self.botonnuevoP.setDisabled(True)
         self.botonmodificarP.setDisabled(False)
         self.botoneliminarP.setDisabled(False)
-        self.multibotonguardar.clicked.connect(self.accionmultiBotonguardar)
+        self.multibotonguardar.clicked.connect(self.accionmcxultiBotonguardar)
 
     def casoModificar(self):
         self.limpiarlayout()
@@ -472,6 +474,120 @@ class Productos(QMainWindow):
             self.valorventaP.setReadOnly(False)
             self.departamento.setDisabled(False)
 
+            self.multibotonguardar.setText("Modificar")
+
+
+            self.multibotonguardar.clicked.connect(self.accionmultiBotonbuscareditar)
+    def accionmultiBotonbuscareditar(self):
+        input("validar valores de los qline edit")
+        # variable para controral si el ingreso de los datos estan correctos
+        self.datosCorrectos = True
+
+        #se valida para ingresar todos los campos
+        if(
+            self.codigoP.text() == ""
+            or self.nombreP.text() == ""
+            or self.valorventaP.text() == ""
+            or self.departamento == ""
+        ):
+            self.datosCorrectos = False
+            self.datosIncompletos()
+        # se revisa que los campos sean numericos
+        else:
+            if(
+                not self.codigoP.text().isnumeric()
+
+            ):
+                QMessageBox.warning(self, "Warning", "El campo codigo debe ser numerico")
+                self.datosCorrectos = False
+            if (
+                    not self.valorcostoP.text().isnumeric()
+            ):
+                QMessageBox.warning(self, "Warning", "El campo precio costo debe ser numerico")
+                self.datosCorrectos = False
+            if(
+                not self.valorventaP.text().isnumeric()
+            ):
+                QMessageBox.warning(self, "Warning", "El campo precio venta debe ser numerico")
+                self.datosCorrectos = False
+            if(
+                self.nombreP.text().isspace()
+            ):
+                QMessageBox.warning(self, "Warning", "El campo nombre no puede contener espacios")
+                self.datosCorrectos = False
+
+
+        # se recorre el archivo para que el codigo no se repita
+        # Abrimos el archivo en modo lectura:
+        self.file = open('datos/productos.txt', 'rb')
+
+        # Lista vacía para agregar todos los usuarios:
+        productos1 = []
+
+        while self.file:
+            linea = self.file.readline().decode('UTF-8')
+
+            # Obtenemos del string una lista con 11 datos separados por;
+            lista = linea.split(";")
+            # Se para si ya no hay más registros en el archivo
+            if linea == '':
+                break
+            # Creamos un objeto de tipo cliente llamado u:
+            print(linea)
+            u = Claseproductos(
+                lista[0],
+                lista[1],
+                lista[2],
+                lista[3],
+                lista[4],
+                lista[5],
+            )
+
+            # Metemos el objeto en la lista de usuarios:
+            productos1.append(u)
+
+        # Cerramos el archivo:
+        self.file.close()
+
+        #recorremos los productos para comparar que no exista el codigo
+        print("y el valor que debe quedar" + str(self.departamento.currentText()))
+        for u in productos1:
+            #comparamos el codigo ingresado
+            if u.codigo == self.codigoP.text():
+                u.nombre = self.nombreP.text()
+                u.valorventa = self.valorventaP.text()
+                u.valorcompra = self.valorcostoP.text()
+                u.departamento = self.departamento.currentText()
+                print("control1: "+u.departamento+ "y el valor que debe quedar"+str(self.departamento.currentText()))
+                self.datosCorrectos = True
+
+        # se gurda el producto
+        if(self.datosCorrectos):
+            # abrimos el archivo en modo agregar escribiendo datos en binario
+
+            # se abre el archivo en modo escritura
+            self.file = open('datos/productos.txt', 'wb')
+
+            for u in productos1:
+                self.file.write(bytes(u.codigo + ';' +
+                                      u.nombre + ';' +
+                                      u.valorcompra + ';' +
+                                      u.valorventa + ';' +
+                                      u.departamento + ';' +
+                                      u.cantidad, encoding='UTF-8'))
+                print("controlmultiple")
+            # cerramos el archivo
+            self.file.close()
+            QMessageBox.question(
+                self,
+                'confirmacion',
+                'El registro ha sido editado exitosamente.',
+                QMessageBox.StandardButton.Yes
+            )
+
+        self.limpiarcampos()
+
+
     def accionmultiBotonbuscareliminar(self):
         # variable para controral si el ingreso de los datos estan correctos
         self.datosCorrectos = False
@@ -622,5 +738,15 @@ class Productos(QMainWindow):
         self.valorcostoP.setText("")
         self.valorventaP.setText("")
         self.inventario.setText("")
+
+if __name__ == '__main__':
+    # hacer que la aplicacion se genere
+    app = QApplication(sys.argv)
+
+    productos = Productos(principal = None,permiso= 1)
+
+    productos.show()
+
+    sys.exit(app.exec_())
 
 

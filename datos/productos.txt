@@ -6,6 +6,6 @@
 58;prueba 3;20000;20000;Dama;0
 56;pijama 3;2000;2000;Dama;0
 45;pijama prueba;2555;2000;Dama;0
-85;cobija;50000;60000;Otros;0
 785;bata;15000;20000;Dama;0
 4562;bata azul;50000;100000;Hombres;0
+89;pijama roja;25000;30000;Hombres;0

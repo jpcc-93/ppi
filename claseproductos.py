@@ -16,3 +16,11 @@ class Claseproductos:
 
     def __str__(self):
         return f"Nombre: {self.nombre} codigo: {self.codigo}"
+
+    def __del__(self):
+        self.codigo = None
+        self.nombre = None
+        self.valorcompra = None
+        self.valorventa = None
+        self.departamento = None
+        self.cantidad = None

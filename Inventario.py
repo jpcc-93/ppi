@@ -1,7 +1,9 @@
+import sys
+
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QIcon, QPixmap, QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget, QFormLayout, QAction, QToolBar, QLabel, QTableWidget, QLineEdit, \
-    QPushButton, QHBoxLayout
+    QPushButton, QHBoxLayout, QApplication
 
 from Fondo import Fondo
 
@@ -205,3 +207,12 @@ class Inventario(QMainWindow):
         self.fondo.setLayout(self.formulario)
 
 
+if __name__ == '__main__':
+    # hacer que la aplicacion se genere
+    app = QApplication(sys.argv)
+
+    inventario = Inventario(principal=None)
+
+    inventario.show()
+
+    sys.exit(app.exec_())
